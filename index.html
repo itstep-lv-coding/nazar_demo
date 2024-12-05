@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Здоровий спосіб життя</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <!-- Меню -->
+
+    <!-- <li><a href="#calculator">Калорійний калькулятор</a></li>
+          <li><a href="#advice">Поради</a></li>
+          <li><a href="#groups">Запис на гуртки</a></li>
+          <li><a href="#journal">Щоденник</a></li> -->
+
+    <ul class="nav justify-content-center">
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="#calculator"
+          >Калькулятор</a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#advice">Поради</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#groups">Запис на гуртки</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#journal"> Щоденник</a>
+      </li>
+    </ul>
+
+    <section id="calculator" class="container my-5">
+      <div class="bg-light p-4 rounded shadow">
+        <h1 class="text-center mb-4">Калорійний калькулятор</h1>
+        <p class="text-center">
+          Введіть продукт чи страву, щоб дізнатися кількість калорій:
+        </p>
+
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <div class="position-relative">
+              <input
+                type="text"
+                id="product-name"
+                class="form-control"
+                placeholder="Введіть продукт або страву"
+              />
+              <div
+                id="autocomplete-list"
+                class="list-group position-absolute w-100"
+              ></div>
+            </div>
+            <button id="calculate-btn" class="btn btn-primary mt-3 w-100">
+              Порахувати
+            </button>
+          </div>
+        </div>
+
+        <!-- Результат -->
+        <div id="result-section" class="mt-4 d-none">
+          <h4 class="small font-weight-bold">
+            Кількість калорій
+            <span id="calorie-value" class="float-right">0%</span>
+          </h4>
+          <div class="progress mb-4">
+            <div
+              id="progress-bar"
+              class="progress-bar bg-danger"
+              role="progressbar"
+              style="width: 0%"
+              aria-valuenow="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+        </div>
+
+        <h2 class="text-center">Популярні продукти:</h2>
+        <ul
+          class="list-group list-group-flush mt-3 mx-auto"
+          style="max-width: 300px"
+        >
+          <li class="list-group-item">Яблуко</li>
+          <li class="list-group-item">Банан</li>
+          <li class="list-group-item">Хліб пшеничний</li>
+          <li class="list-group-item">Яйце</li>
+          <li class="list-group-item">Куряче філе</li>
+          <li class="list-group-item">Молоко</li>
+          <li class="list-group-item">Творог</li>
+          <li class="list-group-item">Печиво</li>
+          <li class="list-group-item">Картопля</li>
+          <li class="list-group-item">Рис</li>
+        </ul>
+      </div>
+    </section>
+
+    <script>
+      const products = {
+        Яблуко: 52,
+        Банан: 89,
+        "Хліб пшеничний": 265,
+        Яйце: 68,
+        "Куряче філе": 165,
+        Молоко: 62,
+        Творог: 98,
+        Печиво: 460,
+        Картопля: 87,
+        Рис: 130,
+      };
+
+      const input = document.getElementById("product-name");
+      const autocompleteList = document.getElementById("autocomplete-list");
+      const resultSection = document.getElementById("result-section");
+      const calorieValue = document.getElementById("calorie-value");
+      const progressBar = document.getElementById("progress-bar");
+
+      input.addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+        autocompleteList.innerHTML = "";
+
+        if (query.length >= 3) {
+          const matches = Object.keys(products).filter((product) =>
+            product.toLowerCase().startsWith(query)
+          );
+
+          matches.forEach((match) => {
+            const listItem = document.createElement("div");
+            listItem.classList.add("list-group-item", "list-group-item-action");
+            listItem.textContent = match;
+
+            // Вибір продукту з автодоповнення
+            listItem.addEventListener("click", function () {
+              input.value = match;
+              autocompleteList.innerHTML = "";
+            });
+
+            autocompleteList.appendChild(listItem);
+          });
+        }
+      });
+
+      document
+        .getElementById("calculate-btn")
+        .addEventListener("click", function () {
+          const productName = input.value.trim();
+          const calories = products[productName] || 0;
+
+          if (calories > 0) {
+            // Відображення результату
+            resultSection.classList.remove("d-none");
+            calorieValue.textContent = `${calories} ккал`;
+            progressBar.style.width = `${(calories / 500) * 100}%`;
+            progressBar.setAttribute("aria-valuenow", (calories / 500) * 100);
+          } else {
+            alert("Цей продукт не знайдено в базі.");
+            resultSection.classList.add("d-none");
+          }
+        });
+
+      // Закриття підказки, якщо клацнути поза списком
+      document.addEventListener("click", function (e) {
+        if (!autocompleteList.contains(e.target) && e.target !== input) {
+          autocompleteList.innerHTML = "";
+        }
+      });
+    </script>
+
+    <section id="advice" class="container my-5">
+      <h1 class="text-center mb-4">Поради для здорового способу життя</h1>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="mb-3">
+                <i class="bi bi-apple fs-1 text-success"></i>
+              </div>
+              <h2 class="card-title">Правильне харчування</h2>
+              <p class="card-text">
+                Правильне харчування є основою здоров'я. Вживайте більше овочів,
+                фруктів та білкових продуктів. Зменшуйте кількість оброблених
+                продуктів та цукру в раціоні.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="mb-3">
+                <i class="bi bi-heart-pulse fs-1 text-danger"></i>
+              </div>
+              <h2 class="card-title">Фізична активність</h2>
+              <p class="card-text">
+                Регулярні тренування не тільки покращують фізичну форму, але й
+                позитивно впливають на психічне здоров'я. Намагайтеся хоча б 30
+                хвилин на день активно рухатися.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="mb-3">
+                <i class="bi bi-moon-stars fs-1 text-primary"></i>
+              </div>
+              <h2 class="card-title">Сон і відпочинок</h2>
+              <p class="card-text">
+                Достатній і якісний сон важливий для відновлення організму.
+                Старайтеся спати 7-9 годин на добу для підтримки здоров'я та
+                енергії.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="mb-3">
+                <i class="bi bi-droplet fs-1 text-info"></i>
+              </div>
+              <h2 class="card-title">Гідратація</h2>
+              <p class="card-text">
+                Пити достатньо води важливо для нормального функціонування
+                організму. Стандартна рекомендація — 8 стаканів води на день,
+                але потреби можуть змінюватися в залежності від фізичної
+                активності.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <div class="mb-3">
+                <i class="bi bi-emoji-smile fs-1 text-warning"></i>
+              </div>
+              <h2 class="card-title">Ментальне здоров'я</h2>
+              <p class="card-text">
+                Стрес і перевтома можуть впливати на фізичне здоров'я.
+                Намагайтеся знаходити час для відпочинку та релаксації,
+                медитації або просто для хобі, яке приносить вам радість.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Запис на гуртки -->
+    <div class="container-lg" id="groups">
+      <div
+        class="bg-secondary text-light py-5 my-5"
+        style="
+          background: url('https://images.unsplash.com/photo-1550147760-44c9966d6bc7?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fGdyZWVuJTIwbGVhZnxlbnwwfHwwfHx8MA%3D%3D')
+            no-repeat;
+          background-size: cover;
+        "
+      >
+        <div class="container">
+          <div class="row justify-content-center">
+            <!-- Ліва частина: Заголовок і опис -->
+            <div class="col-md-5 p-3">
+              <div class="section-header">
+                <h2 class="section-title display-5 text-light">
+                  Запишіться на гурток вашої мрії
+                </h2>
+              </div>
+              <p>
+                Обирайте гурток, заповнюйте форму та станьте частиною нашої
+                спільноти.
+              </p>
+            </div>
+            <!-- Права частина: Форма запису -->
+            <div class="col-md-5 p-3">
+              <form>
+                <div class="mb-3">
+                  <label for="name" class="form-label d-none">Ім'я</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-md rounded-0"
+                    name="name"
+                    id="name"
+                    placeholder="Ваше ім'я"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="form-label d-none"
+                    >Електронна пошта</label
+                  >
+                  <input
+                    type="email"
+                    class="form-control form-control-md rounded-0"
+                    name="email"
+                    id="email"
+                    placeholder="Ваш email"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="group" class="form-label d-none">Гурток</label>
+                  <select
+                    class="form-select form-control-md rounded-0"
+                    name="group"
+                    id="group"
+                  >
+                    <option value="" disabled selected>Оберіть гурток</option>
+                    <option value="йога">Йога</option>
+                    <option value="фітнес">Фітнес</option>
+                    <option value="біг">Біг</option>
+                    <option value="плавання">Плавання</option>
+                    <option value="пилатес">Пілатес</option>
+                  </select>
+                </div>
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-dark btn-md rounded-0">
+                    Записатися
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="journal" class="container my-5">
+      <div class="bg-light p-4 rounded shadow">
+        <h1 class="text-center mb-4">Щоденник харчування та спорту</h1>
+
+        <!-- Форма для додавання запису -->
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <form id="journal-form" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label for="date" class="form-label">Дата</label>
+                <input type="date" id="date" class="form-control" required />
+                <div class="invalid-feedback">Будь ласка, оберіть дату.</div>
+              </div>
+              <div class="mb-3">
+                <label for="meal" class="form-label">Прийом їжі / Вправа</label>
+                <input
+                  type="text"
+                  id="meal"
+                  class="form-control"
+                  placeholder="Наприклад, сніданок, біг"
+                  required
+                />
+                <div class="invalid-feedback">
+                  Будь ласка, вкажіть прийом їжі або вправу.
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="calories" class="form-label"
+                  >Калорії / Час (хв)</label
+                >
+                <input
+                  type="number"
+                  id="calories"
+                  class="form-control"
+                  placeholder="Наприклад, 300"
+                  required
+                />
+                <div class="invalid-feedback">
+                  Будь ласка, введіть значення калорій або часу.
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                Додати
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Таблиця записів -->
+        <h2 class="text-center mt-5">Ваші записи:</h2>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Дата</th>
+                <th>Прийом їжі / Вправа</th>
+                <th>Калорії / Час</th>
+                <th>Дії</th>
+              </tr>
+            </thead>
+            <tbody id="journal-table">
+              <!-- Записи будуть додані тут -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const journalEntries =
+        JSON.parse(localStorage.getItem("journalEntries")) || [];
+
+      const journalForm = document.getElementById("journal-form");
+      const journalTable = document.getElementById("journal-table");
+
+      // Рендеринг таблиці
+      function renderJournal() {
+        journalTable.innerHTML = "";
+        journalEntries.forEach((entry, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+              <td>${entry.date}</td>
+              <td>${entry.meal}</td>
+              <td>${entry.calories}</td>
+              <td>
+                <button class="btn btn-danger btn-sm" onclick="deleteEntry(${index})">Видалити</button>
+              </td>
+            `;
+          journalTable.appendChild(row);
+        });
+        localStorage.setItem("journalEntries", JSON.stringify(journalEntries));
+      }
+
+      // Додавання запису
+      journalForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (!journalForm.checkValidity()) {
+          journalForm.classList.add("was-validated");
+          return;
+        }
+
+        const date = document.getElementById("date").value;
+        const meal = document.getElementById("meal").value;
+        const calories = document.getElementById("calories").value;
+
+        journalEntries.push({ date, meal, calories });
+        renderJournal();
+        journalForm.reset();
+        journalForm.classList.remove("was-validated");
+      });
+
+      // Видалення запису
+      function deleteEntry(index) {
+        journalEntries.splice(index, 1);
+        renderJournal();
+      }
+
+      // Ініціалізація
+      renderJournal();
+    </script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+      integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+      crossorigin="anonymous"
+    ></script>
+    <script src="script.js"></script>
+  </body>
+</html>
